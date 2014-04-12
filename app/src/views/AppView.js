@@ -1,7 +1,5 @@
 define(function(require, exports, module) {
   'use strict';
-  var Engine = require('famous/core/Engine');
-  var Surface = require('famous/core/Surface');
   var Modifier = require('famous/core/Modifier');
   var View = require('famous/core/View');
 
@@ -17,7 +15,15 @@ define(function(require, exports, module) {
   }
 
   function _createReadView() {
-    this.readView = new ReadView();
+    this.readView = new ReadView({
+      edgePeriod: 800,
+      friction: 0.5,
+      drag: 0.2,
+      speedLimit: 10,
+      edgeDamp: 1,
+      edgeGrip: 0.5
+    });
+
     this.readModifier = new Modifier();
 
     this._add(this.readModifier).add(this.readView);

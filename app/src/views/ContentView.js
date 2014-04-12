@@ -1,10 +1,7 @@
 define(function(require, exports, module) {
   'use strict';
-  var Engine = require('famous/core/Engine');
-  var Surface = require('famous/core/Surface');
   var Modifier = require('famous/core/Modifier');
   var HeaderFooterLayout = require('famous/views/HeaderFooterLayout');
-  var View = require('famous/core/View');
 
   var LinkItemView = require('./views/LinkItemView');
 
