@@ -8,7 +8,8 @@ require.config({
         requirejs: '../lib/requirejs/require',
         almond: '../lib/almond/almond',
         'famous-polyfills': '../lib/famous-polyfills/index',
-        leapjs: '../lib/leapjs/leap'
+        leapjs: '../lib/leapjs/leap',
+        fixes: './fixes'
     }
 });
 require(['main']);
