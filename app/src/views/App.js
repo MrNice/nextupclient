@@ -11,7 +11,8 @@ define(function(require, exports, module) {
   function AppView(content) {
     View.apply(this, arguments);
 
-    this.content = new HeaderFooterLayout();
+    //Remove this later
+    this.name = 'appview';
 
     this.background = new Surface({
       size: [undefined, undefined],
@@ -29,19 +30,40 @@ define(function(require, exports, module) {
       origin: [1, 0]
     });
 
+    this.contentMod = new Modifier({
+      origin: [0.5, 0]
+    });
+
     this.readContainer = new ArticleContainer({
       data: content.read
     });
     this.nextContainer = new ArticleContainer({
       data: content.next,
+      name: 'NextUp',
       elementProperties: {
         borderRadius: '5px 0px 0px 5px'
       }
     });
 
+    this.content = new Surface({
+      size: [550, undefined],
+      content: '<h1>' + content.reading[0].title + '</h1>' + content.reading[0].content,
+      properties: {
+        backgroundColor: '#f6ede6',
+        padding: '15px'
+      }
+    });
+
+    this.nextContainer.container.on('surfaceClick', function(surface) {
+      console.log(surface.article);
+      this.content.setContent('<h1>' + surface.article.title + '</h1>' + surface.article.content);
+      this.readContainer.addTab(surface);
+    }.bind(this));
+
     this._add(this.backgroundMod).add(this.background);
     this._add(this.readModifier).add(this.readContainer);
     this._add(this.nextModifier).add(this.nextContainer);
+    this._add(this.contentMod).add(this.content);
   }
 
   AppView.prototype = Object.create(View.prototype);

@@ -9,7 +9,8 @@ require.config({
         almond: '../lib/almond/almond',
         'famous-polyfills': '../lib/famous-polyfills/index',
         leapjs: '../lib/leapjs/leap',
-        fixes: './fixes'
+        fixes: './fixes',
+        backbone: '../lib/backbone/backbone'
     }
 });
 require(['main']);

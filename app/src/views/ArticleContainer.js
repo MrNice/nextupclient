@@ -6,15 +6,16 @@ define(function(require, exports, module) {
   var Modifier         = require('famous/core/Modifier');
   var ContainerSurface = require('famous/surfaces/ContainerSurface');
   var Scrollview       = require('famous/views/Scrollview');
+  var EventHandler = require('famous/core/EventHandler');
 
   var Utility          = require('famous/utilities/Utility');
   var OptionsManager   = require('famous/core/OptionsManager');
 
   function _createBackground() {
     this.background = new Surface({
-      size: [330, undefined],
+      size: [325, undefined],
       properties: {
-        backgroundColor: 'black'
+        backgroundColor: '#8B0000'
       }
     });
 
@@ -33,33 +34,71 @@ define(function(require, exports, module) {
 
     this.container = new ContainerSurface(this.options.container);
     this.scrollview = new Scrollview(this.options.scrollview);
+    this.header = new Surface({
+      size: [325, 50],
+      content: this.options.name,
+      properties: {
+        backgroundColor: '#000',
+        color: '#fff',
+        textAlign: 'center',
+        fontSize: '30px',
+        paddingTop: '5px'
+      }
+    });
+
+    this.headerMod = new Modifier({
+      transform: Transform.translate(0, 0, 1)
+    });
 
     this.surfaces = [];
 
     this.scrollview.sequenceFrom.apply(this.scrollview, [this.surfaces]);
 
-    for (var i = 0; i < 200; i++) {
+    var container = this.container;
+
+    this._clickFunction = function() {
+      container.emit('surfaceClick', this);
+    };
+
+
+    for (var i = 0; i < this.options.data.length; i++) {
+      var title = (this.options.data[i].title.length > 40 ? this.options.data[i].title.slice(0, 40) + '...' : this.options.data[i].title);
       var temp = new Surface({
-        content: 'Surface: ' + (i + 1),
+        // TODO: Fix this overflow hack
+        content: title,
         size: this.options.elementProperties.size,
         properties: {
           backgroundColor: 'hsl(' + (i * 360 / 20) + ', 100%, 50%)',
           lineHeight: this.options.elementProperties.size[1] + 'px',
-          textAlign: 'center',
-          borderRadius: this.options.elementProperties.borderRadius
+          borderRadius: this.options.elementProperties.borderRadius,
+          paddingLeft: '20px'
         }
       });
+
+      temp.article = options.data[i];
+
+      temp.on('click', this._clickFunction);
 
       temp.pipe(this.scrollview);
       this.surfaces.push(temp);
     }
 
-    this.container.add(this.scrollview);
+    EventHandler.setInputHandler(this, this.scrollview);
+    EventHandler.setOutputHandler(this, this.scrollview);
+    this.scrollview.subscribe(this.container);
 
-    this.containerMod = new Modifier();
+    this.container.add(this.scrollview);
+    this.container.on('surfaceClick', function(article){
+      console.log('you clicked');
+    });
+
+    this.containerMod = new Modifier({
+      transform: Transform.translate(0, 50, 0)
+    });
 
     _createBackground.call(this);
 
+    this._add(this.headerMod).add(this.header);
     this._add(this.containerMod).add(this.container);
   }
 
@@ -85,11 +124,17 @@ define(function(require, exports, module) {
       size: [undefined, 80],
       borderRadius: '0px 5px 5px 0px'
     },
-    backgroundPosition: [0, 0]
+    backgroundPosition: [0, 0],
+    name: 'Read'
   };
 
   ArticleContainer.prototype.setOptions = function(options) {
     return this._optionsManager.setOptions(options);
   };
+
+  ArticleContainer.prototype.addTab = function(Surface) {
+    this.surfaces.push(surface);
+    this.render();
+  }
   module.exports = ArticleContainer;
 });

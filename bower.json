@@ -3,10 +3,12 @@
   "description": "A frontend for readnext, anarticle recommendation engine.",
   "version": "0.1.0",
   "homepage": "https://github.com/MrNice/readnext",
-  "authors": [{
-    "name": "Nicholas Van de walle",
-    "url": "http://github.com/MrNice/"
-  }],
+  "authors": [
+    {
+      "name": "Nicholas Van de walle",
+      "url": "http://github.com/MrNice/"
+    }
+  ],
   "main": "app/index.html",
   "moduleType": [
     "amd"
@@ -26,7 +28,8 @@
   "dependencies": {
     "requirejs": "~2.1.11",
     "famous-polyfills": "git@github.com:Famous/polyfills.git",
-    "almond": "~0.2.9"
+    "almond": "~0.2.9",
+    "backbone": "~1.1.2"
   },
   "scripts": {
     "postinstall": "grunt bower"
