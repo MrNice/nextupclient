@@ -8,7 +8,7 @@ define(function(require, exports, module) {
 
   var ArticleContainer = require('views/ArticleContainer');
 
-  function AppView() {
+  function AppView(content) {
     View.apply(this, arguments);
 
     this.content = new HeaderFooterLayout();
@@ -29,8 +29,11 @@ define(function(require, exports, module) {
       origin: [1, 0]
     });
 
-    this.readContainer = new ArticleContainer();
+    this.readContainer = new ArticleContainer({
+      data: content.read
+    });
     this.nextContainer = new ArticleContainer({
+      data: content.next,
       elementProperties: {
         borderRadius: '5px 0px 0px 5px'
       }
