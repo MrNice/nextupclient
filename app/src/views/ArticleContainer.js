@@ -1,12 +1,12 @@
 define(function(require, exports, module) {
   'use strict';
   var Surface          = require('famous/core/Surface');
-  var Transform         = require('famous/core/Transform');
+  var Transform        = require('famous/core/Transform');
   var View             = require('famous/core/View');
   var Modifier         = require('famous/core/Modifier');
   var ContainerSurface = require('famous/surfaces/ContainerSurface');
   var Scrollview       = require('famous/views/Scrollview');
-  var EventHandler = require('famous/core/EventHandler');
+  var EventHandler     = require('famous/core/EventHandler');
 
   var Utility          = require('famous/utilities/Utility');
   var OptionsManager   = require('famous/core/OptionsManager');
@@ -25,18 +25,10 @@ define(function(require, exports, module) {
     this._add(this.backgroundMod).add(this.background);
   }
 
-  function ArticleContainer(options) {
-    View.apply(this, arguments);
-
-    this.options = Object.create(ArticleContainer.DEFAULT_OPTIONS);
-    this._optionsManager = new OptionsManager(this.options);
-    if (options) this.setOptions(options);
-
-    this.container = new ContainerSurface(this.options.container);
-    this.scrollview = new Scrollview(this.options.scrollview);
+  function _createHeader(name) {
     this.header = new Surface({
       size: [325, 50],
-      content: this.options.name,
+      content: name,
       properties: {
         backgroundColor: '#000',
         color: '#fff',
@@ -50,25 +42,49 @@ define(function(require, exports, module) {
       transform: Transform.translate(0, 0, 1)
     });
 
+    this._add(this.headerMod).add(this.header);
+  }
+
+  function ArticleContainer(options) {
+    View.apply(this, arguments);
+
+    // Patch options
+    this.options = Object.create(ArticleContainer.DEFAULT_OPTIONS);
+    this._optionsManager = new OptionsManager(this.options);
+    if (options) this.setOptions(options);
+
+    this.container = new ContainerSurface(this.options.container);
+    this.scrollview = new Scrollview(this.options.scrollview);
+
+    this.containerMod = new Modifier({
+      transform: Transform.translate(0, 50, 0)
+    });
+
     this.surfaces = [];
+    this.scrollview.sequenceFrom.call(this.scrollview, this.surfaces);
 
-    this.scrollview.sequenceFrom.apply(this.scrollview, [this.surfaces]);
-
-    var container = this.container;
+    // TODO: Refactor surfaces
+    var container = this.container; // TODO: Delete when you refactor surfaces
 
     this._clickFunction = function() {
       container.emit('surfaceClick', this);
     };
 
+    var surfaceData = this.options.data;
 
-    for (var i = 0; i < this.options.data.length; i++) {
-      var title = (this.options.data[i].title.length > 40 ? this.options.data[i].title.slice(0, 40) + '...' : this.options.data[i].title);
+    for (var i = 0; i < surfaceData.length; i++) {
+      var title = this.options.data[i].title
+
+      if(title.length > 40) { 
+        title = title.slice(0, 40) + '...';
+      }
+
       var temp = new Surface({
-        // TODO: Fix this overflow hack
+        // TODO: Fix this overflow hack with more preprocessing
         content: title,
         size: this.options.elementProperties.size,
         properties: {
-          backgroundColor: 'hsl(' + (i * 360 / 20) + ', 100%, 50%)',
+          backgroundColor: 'hsl(' + (i * 360 / 12) + ', 86%, 50%)',
           lineHeight: this.options.elementProperties.size[1] + 'px',
           borderRadius: this.options.elementProperties.borderRadius,
           paddingLeft: '20px'
@@ -77,29 +93,19 @@ define(function(require, exports, module) {
 
       temp.article = options.data[i];
 
-      temp.on('click', this._clickFunction);
-
-      temp.pipe(this.scrollview);
       this.surfaces.push(temp);
+      temp.pipe(this.scrollview);
+      temp.on('click', this._clickFunction);
     }
+
+    _createBackground.call(this);
+    _createHeader.call(this, this.options.name);
+    this.container.add(this.scrollview);
+    this._add(this.containerMod).add(this.container);
 
     EventHandler.setInputHandler(this, this.scrollview);
     EventHandler.setOutputHandler(this, this.scrollview);
     this.scrollview.subscribe(this.container);
-
-    this.container.add(this.scrollview);
-    this.container.on('surfaceClick', function(article){
-      console.log('you clicked');
-    });
-
-    this.containerMod = new Modifier({
-      transform: Transform.translate(0, 50, 0)
-    });
-
-    _createBackground.call(this);
-
-    this._add(this.headerMod).add(this.header);
-    this._add(this.containerMod).add(this.container);
   }
 
   ArticleContainer.prototype = Object.create(View.prototype);
@@ -132,9 +138,13 @@ define(function(require, exports, module) {
     return this._optionsManager.setOptions(options);
   };
 
-  ArticleContainer.prototype.addTab = function(Surface) {
-    this.surfaces.push(surface);
-    this.render();
-  }
+  ArticleContainer.prototype.addTab = function(surface) {
+    // this.surfaces.push(surface);
+    // this.render();
+  };
+
+  ArticleContainer.prototype.removeTab = function(surface) {
+  };
+
   module.exports = ArticleContainer;
 });

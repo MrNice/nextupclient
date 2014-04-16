@@ -37,11 +37,11 @@ module.exports = function(grunt) {
             options: {
                 config: '.eslint.json'
             },
-            target: ['<%= config.app %>/src/**/**.js']
+            target: ['<%= config.app %>/src/**/**.js', '!<%= config.app %>/src/dummyData.js']
         },
 
         jscs: {
-            src: ['<%= config.app %>/src/**/**.js', 'Gruntfile.js'],
+            src: ['<%= config.app %>/src/**/**.js', 'Gruntfile.js', '!<%= config.app %>/src/dummyData.js'],
             options: {
                 config: '.jscs.json'
             }
@@ -245,8 +245,6 @@ module.exports = function(grunt) {
 
         grunt.task.run([
             'clean:server',
-            'jscs',
-            'eslint',
             'processhtml:dev',
             'connect:livereload',
             'watch'
@@ -255,8 +253,8 @@ module.exports = function(grunt) {
 
     grunt.registerTask('build', [
         'clean:dist',
-        'jscs',
-        'eslint',
+	'jscs',
+	'eslint',
         'processhtml:dist',
         'useminPrepare',
         'requirejs',

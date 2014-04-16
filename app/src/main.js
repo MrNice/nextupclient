@@ -7,6 +7,7 @@ define(function(require, exports, module) {
 
     var AppView = require('./views/App');
 
+    // TODO: Refactor to use backbone models with API Requests
     var appView = new AppView(dummyData);
     // create the main context
     var mainContext = Engine.createContext();
