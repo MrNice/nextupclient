@@ -10,7 +10,9 @@ require.config({
         'famous-polyfills': '../lib/famous-polyfills/index',
         leapjs: '../lib/leapjs/leap',
         fixes: './fixes',
-        backbone: '../lib/backbone/backbone'
+        backbone: '../lib/backbone/backbone',
+        underscore: '../lib/underscore/underscore',
+        jquery: '../lib/jquery/dist/jquery'
     }
 });
 require(['main']);

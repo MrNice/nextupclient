@@ -10,10 +10,11 @@ define(function(require, exports, module) {
 
   function ContentView(content) {
     View.apply(this, arguments);
+    console.log(content);
 
     this.content = new Surface({
       size: [700, undefined],
-      content: '<h1>' + content.reading[0].title + '</h1>' + content.reading[0].content,
+      // content: '<h1>' + content.get('title') + '</h1>' + content.get('content'),
       properties: {
         backgroundColor: '#f6ede6',
         overflowY: 'auto',
@@ -21,7 +22,7 @@ define(function(require, exports, module) {
         padding: '15px'
       }
     });
-  
+
     this.contentLift = new Modifier({
       transform: Transform.translate(0, 0, 2)
     });
@@ -40,7 +41,7 @@ define(function(require, exports, module) {
   };
 
   ContentView.prototype.rotateMore = function() {
-    this.contentMod.transform = Transform(Math.PI/6);
+    this.contentMod.transform = Transform(Math.PI / 6);
   };
 
   ContentView.DEFAULT_OPTIONS = {

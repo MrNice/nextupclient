@@ -37,11 +37,11 @@ module.exports = function(grunt) {
             options: {
                 config: '.eslint.json'
             },
-            target: ['<%= config.app %>/src/**/**.js', '!<%= config.app %>/src/dummyData.js']
+            target: ['<%= config.app %>/src/**/**.js', '!<%= config.app %>/src/dummyData.js', '!<%= config.app %>/src/models/dummyData.js']
         },
 
         jscs: {
-            src: ['<%= config.app %>/src/**/**.js', 'Gruntfile.js', '!<%= config.app %>/src/dummyData.js'],
+            src: ['<%= config.app %>/src/**/**.js', 'Gruntfile.js', '!<%= config.app %>/src/dummyData.js', '!<%= config.app %>/src/models/dummyData.js'],
             options: {
                 config: '.jscs.json'
             }

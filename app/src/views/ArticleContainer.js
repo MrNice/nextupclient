@@ -46,6 +46,7 @@ define(function(require, exports, module) {
   }
 
   function ArticleContainer(options) {
+    console.log('Articlecontiner options', options);
     View.apply(this, arguments);
 
     // Patch options
@@ -70,14 +71,11 @@ define(function(require, exports, module) {
       container.emit('surfaceClick', this);
     };
 
-    var surfaceData = this.options.data;
+    // Refactoring to use a backbone collection
+    this.options.data.each(function(article, i, articles) {
+      var title = article.get('title');
 
-    for (var i = 0; i < surfaceData.length; i++) {
-      var title = this.options.data[i].title
-
-      if(title.length > 40) { 
-        title = title.slice(0, 40) + '...';
-      }
+      if (title.length > 40) title = title.slice(0, 40) + '...';
 
       var temp = new Surface({
         // TODO: Fix this overflow hack with more preprocessing
@@ -96,7 +94,33 @@ define(function(require, exports, module) {
       this.surfaces.push(temp);
       temp.pipe(this.scrollview);
       temp.on('click', this._clickFunction);
-    }
+    }, this);
+
+    // var surfaceData = this.options.data;
+
+    // for (var i = 0; i < surfaceData.length; i++) {
+    //   var title = this.options.data[i].get('title');
+
+    //   if (title.length > 40) title = title.slice(0, 40) + '...';
+
+    //   var temp = new Surface({
+    //     // TODO: Fix this overflow hack with more preprocessing
+    //     content: title,
+    //     size: this.options.elementProperties.size,
+    //     properties: {
+    //       backgroundColor: 'hsl(' + (i * 360 / 12) + ', 86%, 50%)',
+    //       lineHeight: this.options.elementProperties.size[1] + 'px',
+    //       borderRadius: this.options.elementProperties.borderRadius,
+    //       paddingLeft: '20px'
+    //     }
+    //   });
+
+    //   temp.article = options.data[i];
+
+    //   this.surfaces.push(temp);
+    //   temp.pipe(this.scrollview);
+    //   temp.on('click', this._clickFunction);
+    // }
 
     _createBackground.call(this);
     _createHeader.call(this, this.options.name);

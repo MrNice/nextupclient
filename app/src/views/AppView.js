@@ -1,53 +1,94 @@
 define(function(require, exports, module) {
   'use strict';
-  var Modifier = require('famous/core/Modifier');
-  var View = require('famous/core/View');
+  var Surface            = require('famous/core/Surface');
+  var Transform          = require('famous/core/Transform');
+  var Modifier           = require('famous/core/Modifier');
+  var View               = require('famous/core/View');
 
-  var ContentView = require('./views/ContentView');
-  var ReadView = require('./views/ReadView');
-  var NextView = require('./views/NextView');
+  var ArticleContainer   = require('views/ArticleContainer');
+  var ContentView        = require('views/ContentView');
 
-  function _createContentView() {
-    this.contentView = new ContentView();
-    this.contentModifier = new Modifier();
-
-    this._add(this.contentModifier).add(this.contentView);
-  }
-
-  function _createReadView() {
-    this.readView = new ReadView({
-      edgePeriod: 800,
-      friction: 0.5,
-      drag: 0.2,
-      speedLimit: 10,
-      edgeDamp: 1,
-      edgeGrip: 0.5
+  function _createBackground() {
+    this.background = new Surface({
+      size: [undefined, undefined],
+      properties: {
+        backgroundColor: 'brown'
+      }
     });
 
-    this.readModifier = new Modifier();
+    this.backgroundMod = new Modifier({
+      transform: Transform.translate(0, 0, -2)
+    });
 
-    this._add(this.readModifier).add(this.readView);
+    this._add(this.backgroundMod).add(this.background);
   }
 
-  function _createNextView() {
-    this.nextView = new NextView();
-    this.nextModifier = new Modifier();
+  function _createContent() {
+    this.contentView = new ContentView(this.options.contentOptions);
 
-    this._add(this.nextModifier).add(this.nextView);
+    this.contentMod = new Modifier({
+      origin: [0.5, 0]
+    });
+
+    this._add(this.contentMod).add(this.contentView);
   }
 
-  function AppView() {
+  function AppView(app) {
+    var content = app;
     View.apply(this, arguments);
 
-    _createContentView.call(this);
-    _createReadView.call(this);
-    _createNextView.call(this);
+    // TODO: Remove this later
+    this.name = 'appview';
+    // TODO: Refactor to use API Calls
+    this.options.contentOptions = app.get('articles').models.slice(0,1);
+    this.options.readOptions.container.data = app.get('articles');
+    this.options.nextOptions.container.data = app.get('articles');
+
+    this.readModifier = new Modifier(this.options.readOptions.modifier);
+    this.readContainer = new ArticleContainer(this.options.readOptions.container);
+
+    this.nextModifier = new Modifier(this.options.nextOptions.modifier);
+    this.nextContainer = new ArticleContainer(this.options.nextOptions.container);
+
+    this.nextContainer.container.on('surfaceClick', function(surface) {
+      this.contentView.content.setContent('<h1>' + surface.article.title + '</h1>' + surface.article.content);
+    }.bind(this));
+
+    this.readContainer.container.on('surfaceClick', function(surface) {
+      this.contentView.content.setContent('<h1>' + surface.article.title + '</h1>' + surface.article.content);
+    }.bind(this));
+
+    this._add(this.readModifier).add(this.readContainer);
+    this._add(this.nextModifier).add(this.nextContainer);
+
+    _createBackground.call(this);
+    _createContent.call(this);
   }
 
   AppView.prototype = Object.create(View.prototype);
   AppView.prototype.constructor = AppView;
 
-  AppView.DEFAULT_OPTIONS = {};
+  AppView.DEFAULT_OPTIONS = {
+    nextOptions: {
+      container: {
+        name: 'NextUp',
+        elementProperties: {
+          borderRadius: '5px 0px 0px 5px'
+        }
+      },
+      modifier: {
+        origin: [1, 0]
+      }
+    },
+    readOptions: {
+      container: {
+        name: 'Read'
+      },
+      modifier: {
+        origin: [0, 0]
+      }
+    }
+  };
 
   module.exports = AppView;
 });

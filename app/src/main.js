@@ -2,15 +2,18 @@
 define(function(require, exports, module) {
     'use strict';
     // import dependencies
-    var Engine = require('famous/core/Engine');
+    var Engine    = require('famous/core/Engine');
+    var App       = require('./models/App');
+    var AppView   = require('./views/AppView');
     var dummyData = require('./dummyData').exports;
 
-    var AppView = require('./views/App');
-
     // TODO: Refactor to use backbone models with API Requests
-    var appView = new AppView(dummyData);
+    var app     = new App();
+    var appView = new AppView(app);
+
     // create the main context
     var mainContext = Engine.createContext();
+    mainContext.setPerspective(500); // No reason for this yet
 
     mainContext.add(appView);
 });

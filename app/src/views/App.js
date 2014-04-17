@@ -4,7 +4,6 @@ define(function(require, exports, module) {
   var Transform          = require('famous/core/Transform');
   var Modifier           = require('famous/core/Modifier');
   var View               = require('famous/core/View');
-  var HeaderFooterLayout = require('famous/views/HeaderFooterLayout');
 
   var ArticleContainer   = require('views/ArticleContainer');
   var ContentView        = require('views/ContentView');
@@ -24,8 +23,8 @@ define(function(require, exports, module) {
     this._add(this.backgroundMod).add(this.background);
   }
 
-  function _createContent(content) { 
-    this.contentView = new ContentView(content);
+  function _createContent() {
+    this.contentView = new ContentView(this.options);
 
     this.contentMod = new Modifier({
       origin: [0.5, 0]
@@ -51,26 +50,17 @@ define(function(require, exports, module) {
 
     this.nextContainer.container.on('surfaceClick', function(surface) {
       this.contentView.content.setContent('<h1>' + surface.article.title + '</h1>' + surface.article.content);
-      // this.readContainer.addTab(surface);
     }.bind(this));
 
     this.readContainer.container.on('surfaceClick', function(surface) {
       this.contentView.content.setContent('<h1>' + surface.article.title + '</h1>' + surface.article.content);
-      // this.readContainer.addTab(surface);
     }.bind(this));
-
-    _createBackground.call(this);
-
-    this.contentView = new ContentView(this.options);
-
-    this.contentMod = new Modifier({
-      origin: [0.5, 0]
-    });
-
-    this._add(this.contentMod).add(this.contentView);
 
     this._add(this.readModifier).add(this.readContainer);
     this._add(this.nextModifier).add(this.nextContainer);
+
+    _createBackground.call(this);
+    _createContent.call(this);
   }
 
   AppView.prototype = Object.create(View.prototype);
@@ -90,7 +80,7 @@ define(function(require, exports, module) {
     },
     readOptions: {
       container: {
-        name: 'Read',
+        name: 'Read'
       },
       modifier: {
         origin: [0, 0]
