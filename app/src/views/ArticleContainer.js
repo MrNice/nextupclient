@@ -5,11 +5,14 @@ define(function(require, exports, module) {
   var View             = require('famous/core/View');
   var Modifier         = require('famous/core/Modifier');
   var ContainerSurface = require('famous/surfaces/ContainerSurface');
+  var ViewSequence     = require('famous/core/ViewSequence');
   var Scrollview       = require('famous/views/Scrollview');
   var EventHandler     = require('famous/core/EventHandler');
 
   var Utility          = require('famous/utilities/Utility');
   var OptionsManager   = require('famous/core/OptionsManager');
+
+  var ArticleTab       = require('./ArticleTab');
 
   function _createBackground() {
     this.background = new Surface({
@@ -48,6 +51,8 @@ define(function(require, exports, module) {
   function ArticleContainer(options) {
     View.apply(this, arguments);
 
+    this.collection = options.data;
+
     // Patch options
     this.options = Object.create(ArticleContainer.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
@@ -60,8 +65,9 @@ define(function(require, exports, module) {
       transform: Transform.translate(0, 50, 0)
     });
 
-    this.surfaces = [];
-    this.scrollview.sequenceFrom.call(this.scrollview, this.surfaces);
+    this.articleTabs = [];
+    this.viewSequence = new ViewSequence(this.articleTabs);
+    this.scrollview.sequenceFrom.call(this.scrollview, this.viewSequence);
 
     // TODO: Refactor surfaces
     var container = this.container; // TODO: Delete when you refactor surfaces
@@ -71,7 +77,7 @@ define(function(require, exports, module) {
     };
 
     // Refactoring to use a backbone collection
-    this.options.data.each(function(article, i, articles) {
+    this.collection.each(function(article, i, articles) {
       var title = article.get('title');
 
       if (title.length > 40) title = title.slice(0, 40) + '...';
@@ -90,36 +96,22 @@ define(function(require, exports, module) {
       });
       temp.article = article;
 
-      this.surfaces.push(temp);
+      this.articleTabs.push(temp);
       temp.pipe(this.scrollview);
       temp.on('click', this._clickFunction);
     }, this);
 
-    // var surfaceData = this.options.data;
+    this.collection.on('remove', function(task, collection, removalData) {
+      this.taskViews[removalData.index].delete(function() {
+        this.viewSequence.splice(removalData.index, 1);
+      }.bind(this));
+    }.bind(this));
 
-    // for (var i = 0; i < surfaceData.length; i++) {
-    //   var title = this.options.data[i].get('title');
-
-    //   if (title.length > 40) title = title.slice(0, 40) + '...';
-
-    //   var temp = new Surface({
-    //     // TODO: Fix this overflow hack with more preprocessing
-    //     content: title,
-    //     size: this.options.elementProperties.size,
-    //     properties: {
-    //       backgroundColor: 'hsl(' + (i * 360 / 12) + ', 86%, 50%)',
-    //       lineHeight: this.options.elementProperties.size[1] + 'px',
-    //       borderRadius: this.options.elementProperties.borderRadius,
-    //       paddingLeft: '20px'
-    //     }
-    //   });
-
-    //   temp.article = options.data[i];
-
-    //   this.surfaces.push(temp);
-    //   temp.pipe(this.scrollview);
-    //   temp.on('click', this._clickFunction);
-    // }
+    this.collection.on('add', function(task) {
+      // this.taskViews[removalData.index].delete(function() {
+      //   this.viewSequence.splice(removalData.index, 1);
+      // }.bind(this));
+    }.bind(this));
 
     _createBackground.call(this);
     _createHeader.call(this, this.options.name);
@@ -161,12 +153,30 @@ define(function(require, exports, module) {
     return this._optionsManager.setOptions(options);
   };
 
-  ArticleContainer.prototype.addTab = function(surface) {
-    // this.surfaces.push(surface);
-    // this.render();
-  };
+  ArticleContainer.prototype.setContent = function(options) {
+    // this.collection.each(function(article, i, collection) {
+    //   var title = article.get('title');
 
-  ArticleContainer.prototype.removeTab = function(surface) {
+    //   if (title.length > 40) title = title.slice(0, 40) + '...';
+    //   article.set('color', 'hsl(' + (i * 360 / 12) + ', 86%, 50%)');
+
+    //   var temp = new Surface({
+    //     // TODO: Fix this overflow hack with more preprocessing
+    //     content: title,
+    //     size: this.options.elementProperties.size,
+    //     properties: {
+    //       backgroundColor: article.get('color'),
+    //       lineHeight: this.options.elementProperties.size[1] + 'px',
+    //       borderRadius: this.options.elementProperties.borderRadius,
+    //       paddingLeft: '20px'
+    //     }
+    //   });
+    //   temp.article = article;
+
+    //   this.surfaces.push(temp);
+    //   temp.pipe(this.scrollview);
+    //   temp.on('click', this._clickFunction);
+    // });
   };
 
   module.exports = ArticleContainer;

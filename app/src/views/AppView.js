@@ -40,18 +40,19 @@ define(function(require, exports, module) {
     // TODO: Remove this later
     this.name = 'appview';
     // TODO: Refactor to use API Calls
-    this.options.contentOptions = app.get('articles').models.slice(0,1);
-    this.options.readOptions.container.data = app.get('articles');
-    this.options.nextOptions.container.data = app.get('articles');
+
+    this.options.contentOptions = app.get('nextup').first();
+    this.options.nextOptions.containerOptions.data = app.get('nextup');
+    this.options.readOptions.containerOptions.data = app.get('read');
 
     this.readModifier = new Modifier(this.options.readOptions.modifier);
-    this.readContainer = new ArticleContainer(this.options.readOptions.container);
+    this.readContainer = new ArticleContainer(this.options.readOptions.containerOptions);
 
     this.nextModifier = new Modifier(this.options.nextOptions.modifier);
-    this.nextContainer = new ArticleContainer(this.options.nextOptions.container);
+    this.nextContainer = new ArticleContainer(this.options.nextOptions.containerOptions);
 
     this.nextContainer.container.on('surfaceClick', function(surface) {
-      console.log(surface.article);
+      // TODO: Splice out and add to read
       this.contentView.content.setContent('<h1>' + surface.article.get('title') + '</h1>' + surface.article.get('content'));
     }.bind(this));
 
@@ -71,7 +72,7 @@ define(function(require, exports, module) {
 
   AppView.DEFAULT_OPTIONS = {
     nextOptions: {
-      container: {
+      containerOptions: {
         name: 'NextUp',
         elementProperties: {
           borderRadius: '5px 0px 0px 5px'
@@ -85,7 +86,7 @@ define(function(require, exports, module) {
       }
     },
     readOptions: {
-      container: {
+      containerOptions: {
         name: 'Read',
         filter: function(model, i, collection) {
           return model.get('read');

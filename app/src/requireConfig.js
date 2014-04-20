@@ -12,7 +12,8 @@ require.config({
         fixes: './fixes',
         backbone: '../lib/backbone/backbone',
         underscore: '../lib/underscore/underscore',
-        jquery: '../lib/jquery/dist/jquery'
+        jquery: '../lib/jquery/dist/jquery',
+        'backbone.collectionsubset': '../lib/backbone.collectionsubset/dist/backbone.collectionsubset.min'
     }
 });
 require(['main']);

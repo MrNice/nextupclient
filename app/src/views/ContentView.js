@@ -4,16 +4,13 @@ define(function(require, exports, module) {
   var Modifier       = require('famous/core/Modifier');
   var View           = require('famous/core/View');
   var Transform      = require('famous/core/Transform');
-  var Transitionable = require('famous/transitions/Transitionable');
-  var Easing         = require('famous/transitions/Easing');
-  var CachedMap      = require('famous/transitions/CachedMap');
 
   function ContentView(content) {
     View.apply(this, arguments);
 
     this.content = new Surface({
       size: [700, undefined],
-      // content: '<h1>' + content.get('title') + '</h1>' + content.get('content'),
+      content: '<h1>' + content.get('title') + '</h1>' + content.get('content'),
       properties: {
         backgroundColor: '#f6ede6',
         overflowY: 'auto',
