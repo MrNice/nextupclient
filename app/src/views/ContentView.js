@@ -10,7 +10,6 @@ define(function(require, exports, module) {
 
   function ContentView(content) {
     View.apply(this, arguments);
-    console.log(content);
 
     this.content = new Surface({
       size: [700, undefined],
@@ -28,7 +27,7 @@ define(function(require, exports, module) {
     });
 
     this.contentRotate = new Modifier({
-      // transform: Transform.rotateZ(Math.PI/7)
+      // transform: Transform.rotateY(Math.PI/7)
     });
 
     this._add(this.contentLift).add(this.contentRotate).add(this.content);

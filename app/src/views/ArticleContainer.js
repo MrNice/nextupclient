@@ -46,7 +46,6 @@ define(function(require, exports, module) {
   }
 
   function ArticleContainer(options) {
-    console.log('Articlecontiner options', options);
     View.apply(this, arguments);
 
     // Patch options
@@ -76,20 +75,20 @@ define(function(require, exports, module) {
       var title = article.get('title');
 
       if (title.length > 40) title = title.slice(0, 40) + '...';
+      article.set('color', 'hsl(' + (i * 360 / 12) + ', 86%, 50%)');
 
       var temp = new Surface({
         // TODO: Fix this overflow hack with more preprocessing
         content: title,
         size: this.options.elementProperties.size,
         properties: {
-          backgroundColor: 'hsl(' + (i * 360 / 12) + ', 86%, 50%)',
+          backgroundColor: article.get('color'),
           lineHeight: this.options.elementProperties.size[1] + 'px',
           borderRadius: this.options.elementProperties.borderRadius,
           paddingLeft: '20px'
         }
       });
-
-      temp.article = options.data[i];
+      temp.article = article;
 
       this.surfaces.push(temp);
       temp.pipe(this.scrollview);

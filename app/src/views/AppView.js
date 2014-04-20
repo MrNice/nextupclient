@@ -51,11 +51,12 @@ define(function(require, exports, module) {
     this.nextContainer = new ArticleContainer(this.options.nextOptions.container);
 
     this.nextContainer.container.on('surfaceClick', function(surface) {
-      this.contentView.content.setContent('<h1>' + surface.article.title + '</h1>' + surface.article.content);
+      console.log(surface.article);
+      this.contentView.content.setContent('<h1>' + surface.article.get('title') + '</h1>' + surface.article.get('content'));
     }.bind(this));
 
     this.readContainer.container.on('surfaceClick', function(surface) {
-      this.contentView.content.setContent('<h1>' + surface.article.title + '</h1>' + surface.article.content);
+      this.contentView.content.setContent('<h1>' + surface.article.get('title') + '</h1>' + surface.article.get('content'));
     }.bind(this));
 
     this._add(this.readModifier).add(this.readContainer);
@@ -74,6 +75,9 @@ define(function(require, exports, module) {
         name: 'NextUp',
         elementProperties: {
           borderRadius: '5px 0px 0px 5px'
+        },
+        filter: function(model, i, collection) {
+          return model.get('next');
         }
       },
       modifier: {
@@ -82,7 +86,10 @@ define(function(require, exports, module) {
     },
     readOptions: {
       container: {
-        name: 'Read'
+        name: 'Read',
+        filter: function(model, i, collection) {
+          return model.get('read');
+        }
       },
       modifier: {
         origin: [0, 0]
