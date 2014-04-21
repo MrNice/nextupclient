@@ -7,13 +7,30 @@ define(function(require, exports, module) {
 
   module.exports = Backbone.Model.extend({
     initialize: function(params) {
-      this.fetch();
+      // TODO : HOOK THIS UP TO THE SERVER :D
+      // this.set('articles', new Articles(this.fetch()));
+      this.set('articles', new Articles(defaultArticles));
+      this.get('articles').first().set('read', true); // Place one thing in the start
+      this.set('nextup', new Articles(this.get('articles')
+                                          .filter(function(article) {
+        return !article.get('read');
+      })));
+      this.set('read', new Articles(this.get('articles')
+                                          .filter(function(article) {
+        return article.get('read');
+      })));
     },
     fetch: function() {
-      // TODO : HOOK THIS UP TO THE SERVER :D
-      this.set('articles', new Articles(defaultArticles));
-      this.set('nextup', new Articles(defaultArticles));
-      this.set('read', new Articles());
+    },
+    refreshSubsets: function() {
+      this.set('nextup', new Articles(this.get('articles')
+                                          .filter(function(article) {
+        return !article.get('read')
+      })));
+      this.set('read', new Articles(this.get('articles')
+                                          .filter(function(article) {
+        return article.get('read')
+      })));
     }
   });
 });

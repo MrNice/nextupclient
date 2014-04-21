@@ -121,6 +121,7 @@ define(function(require, exports, module) {
     EventHandler.setInputHandler(this, this.scrollview);
     EventHandler.setOutputHandler(this, this.scrollview);
     this.scrollview.subscribe(this.container);
+
   }
 
   ArticleContainer.prototype = Object.create(View.prototype);
@@ -153,31 +154,9 @@ define(function(require, exports, module) {
     return this._optionsManager.setOptions(options);
   };
 
-  ArticleContainer.prototype.setContent = function(options) {
-    // this.collection.each(function(article, i, collection) {
-    //   var title = article.get('title');
+  // ArticleContainer.prototype.removeTab = function() {
 
-    //   if (title.length > 40) title = title.slice(0, 40) + '...';
-    //   article.set('color', 'hsl(' + (i * 360 / 12) + ', 86%, 50%)');
-
-    //   var temp = new Surface({
-    //     // TODO: Fix this overflow hack with more preprocessing
-    //     content: title,
-    //     size: this.options.elementProperties.size,
-    //     properties: {
-    //       backgroundColor: article.get('color'),
-    //       lineHeight: this.options.elementProperties.size[1] + 'px',
-    //       borderRadius: this.options.elementProperties.borderRadius,
-    //       paddingLeft: '20px'
-    //     }
-    //   });
-    //   temp.article = article;
-
-    //   this.surfaces.push(temp);
-    //   temp.pipe(this.scrollview);
-    //   temp.on('click', this._clickFunction);
-    // });
-  };
+  // };
 
   module.exports = ArticleContainer;
 });

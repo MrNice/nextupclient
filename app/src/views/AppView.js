@@ -34,7 +34,6 @@ define(function(require, exports, module) {
   }
 
   function AppView(app) {
-    var content = app;
     View.apply(this, arguments);
 
     // TODO: Remove this later

@@ -8,8 +8,8 @@ define(function(require, exports, module) {
     var dummyData = require('./dummyData').exports;
 
     // TODO: Refactor to use backbone models with API Requests
-    var app     = new App();
-    var appView = new AppView(app);
+    window.app     = new App();
+    var appView = new AppView(window.app);
 
     // create the main context
     var mainContext = Engine.createContext();

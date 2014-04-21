@@ -5,7 +5,6 @@ define(function(exports, module) {
   for(var key in json) {
     articles.push(json[key]);
   }
-  articles[6]['read'] = true;
 
   window.dummyData = {
     read: articles.slice(6, 7),
