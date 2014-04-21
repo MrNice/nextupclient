@@ -1,5 +1,6 @@
 define(function(require, exports, module) {
   'use strict';
+  var Engine           = require('famous/core/Engine');
   var Surface          = require('famous/core/Surface');
   var Transform        = require('famous/core/Transform');
   var View             = require('famous/core/View');
@@ -51,12 +52,11 @@ define(function(require, exports, module) {
   function ArticleContainer(options) {
     View.apply(this, arguments);
 
-    this.collection = options.data;
-
-    // Patch options
     this.options = Object.create(ArticleContainer.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
     if (options) this.setOptions(options);
+
+    this.collection = options.data;
 
     this.container = new ContainerSurface(this.options.container);
     this.scrollview = new Scrollview(this.options.scrollview);
@@ -67,42 +67,24 @@ define(function(require, exports, module) {
 
     this.articleTabs = [];
     this.viewSequence = new ViewSequence(this.articleTabs);
-    this.scrollview.sequenceFrom.call(this.scrollview, this.viewSequence);
+    this.scrollview.sequenceFrom(this.viewSequence);
 
-    // TODO: Refactor surfaces
-    var container = this.container; // TODO: Delete when you refactor surfaces
-
-    this._clickFunction = function() {
-      container.emit('surfaceClick', this);
-    };
-
-    // Refactoring to use a backbone collection
     this.collection.each(function(article, i, articles) {
-      var title = article.get('title');
-
-      if (title.length > 40) title = title.slice(0, 40) + '...';
       article.set('color', 'hsl(' + (i * 360 / 12) + ', 86%, 50%)');
+      var temp = new ArticleTab(article, options);
 
-      var temp = new Surface({
-        // TODO: Fix this overflow hack with more preprocessing
-        content: title,
-        size: this.options.elementProperties.size,
-        properties: {
-          backgroundColor: article.get('color'),
-          lineHeight: this.options.elementProperties.size[1] + 'px',
-          borderRadius: this.options.elementProperties.borderRadius,
-          paddingLeft: '20px'
-        }
-      });
-      temp.article = article;
-
-      this.articleTabs.push(temp);
       temp.pipe(this.scrollview);
-      temp.on('click', this._clickFunction);
+      temp.pipe(this._eventInput);
+      this.articleTabs.push(temp);
     }, this);
 
+    this._eventInput.on('surfaceClick', function(model) {
+      console.log('container sees surface click, reemits!', model);
+      this._eventOutput.emit('surfaceClick', model);
+    }.bind(this.scrollview));
+
     this.collection.on('remove', function(task, collection, removalData) {
-      this.taskViews[removalData.index].delete(function() {
+      this.articleTabs[removalData.index].delete(function() {
         this.viewSequence.splice(removalData.index, 1);
       }.bind(this));
     }.bind(this));
@@ -112,6 +94,12 @@ define(function(require, exports, module) {
       //   this.viewSequence.splice(removalData.index, 1);
       // }.bind(this));
     }.bind(this));
+
+    Engine.on('click', function() {
+      console.log('clicked on the page');
+      console.log(this);
+      this._eventOutput.emit('testEvent');
+    }.bind(this.scrollview));
 
     _createBackground.call(this);
     _createHeader.call(this, this.options.name);
@@ -141,10 +129,6 @@ define(function(require, exports, module) {
       properties: {
         overflow: 'hidden'
       }
-    },
-    elementProperties: {
-      size: [undefined, 80],
-      borderRadius: '0px 5px 5px 0px'
     },
     backgroundPosition: [0, 0],
     name: 'Read'

@@ -13,7 +13,6 @@ define(function(require, exports, module) {
 
     // create the main context
     var mainContext = Engine.createContext();
-    // mainContext.setPerspective(500); // No reason for this yet
 
     mainContext.add(appView);
 });

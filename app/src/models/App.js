@@ -22,14 +22,14 @@ define(function(require, exports, module) {
     },
     fetch: function() {
     },
-    refreshSubsets: function() {
+    setSubCollections: function() {
       this.set('nextup', new Articles(this.get('articles')
                                           .filter(function(article) {
-        return !article.get('read')
+        return !article.get('read');
       })));
       this.set('read', new Articles(this.get('articles')
                                           .filter(function(article) {
-        return article.get('read')
+        return article.get('read');
       })));
     }
   });
