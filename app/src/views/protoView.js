@@ -1,5 +1,5 @@
-define(function(require, exports, module) {
-  'use strict';
+// define(function(require, exports, module) {
+//   'use strict';
   // var Engine = require('famous/core/Engine');
   // var Surface = require('famous/core/Surface');
   // var Modifier = require('famous/core/Modifier');
@@ -26,4 +26,4 @@ define(function(require, exports, module) {
   // myView.DEFAULT_OPTIONS = {};
 
   // module.exports = myView;
-});
+// });

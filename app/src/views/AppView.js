@@ -33,50 +33,47 @@ define(function(require, exports, module) {
     this._add(this.contentMod).add(this.contentView);
   }
 
+  function _setupListeners() {
+    this.nextContainer.on('surfaceClick', function(article) {
+      // TODOING: Splice out and add to read
+      this.contentView.content.setContent('<h1>' + article.get('title') + '</h1>' + article.get('content'));
+      this.readContainer.collection.add(article);
+      this.nextContainer.collection.remove(article);
+      // Ajax request
+    }.bind(this));
+
+    this.readContainer.on('surfaceClick', function(article) {
+      this.contentView.content.setContent('<h1>' + article.get('title') + '</h1>' + article.get('content'));
+    }.bind(this));
+  }
+
   function AppView(app) {
     View.apply(this, arguments);
 
     // TODO: Remove this later
     this.name = 'appview';
     // TODO: Refactor to use API Calls
-    console.log(this._eventInput);
 
-    this.options.contentOptions = app.get('nextup').first();
+    this.options.contentOptions = app.get('read').first();
     this.options.nextOptions.containerOptions.data = app.get('nextup');
     this.options.readOptions.containerOptions.data = app.get('read');
 
     this.readModifier = new Modifier(this.options.readOptions.modifier);
     this.readContainer = new ArticleContainer(this.options.readOptions.containerOptions);
+    this.readContainer.options.start = [-400, 0, 0]; // Patching start after initialization
     this.readContainer.pipe(this._eventInput);
 
     this.nextModifier = new Modifier(this.options.nextOptions.modifier);
     this.nextContainer = new ArticleContainer(this.options.nextOptions.containerOptions);
     this.nextContainer.pipe(this._eventInput);
 
-    this._eventInput.on('testEvent', function() {
-      console.log('Event happened');
-    });
-
-    this.readContainer.on('surfaceClick', function() {console.log('Thisworked')});
-    this.nextContainer.on('surfaceClick', function() {console.log('Thisworked')});
-    this._eventInput.on('surfaceClick', function(model) {
-      console.log('Model received by appview', model);
-    }.bind(this));
-    this.nextContainer.on('surfaceClick', function(article) {
-      // TODO: Splice out and add to read
-      console.log('the nextContainer container saw the surfaceClick');
-      this.contentView.content.setContent('<h1>' + article.get('title') + '</h1>' + article.get('content'));
-    }.bind(this));
-
-    this.readContainer.container.on('surfaceClick', function(surface) {
-      this.contentView.content.setContent('<h1>' + surface.article.get('title') + '</h1>' + surface.article.get('content'));
-    }.bind(this));
-
     this._add(this.readModifier).add(this.readContainer);
     this._add(this.nextModifier).add(this.nextContainer);
 
+    // Order is important
     _createBackground.call(this);
     _createContent.call(this);
+    _setupListeners.call(this);
   }
 
   AppView.prototype = Object.create(View.prototype);
@@ -89,7 +86,7 @@ define(function(require, exports, module) {
         elementProperties: {
           borderRadius: '5px 0px 0px 5px'
         },
-        filter: function(model, i, collection) {
+        filter: function(model) {
           return model.get('next');
         }
       },
@@ -100,9 +97,10 @@ define(function(require, exports, module) {
     readOptions: {
       containerOptions: {
         name: 'Read',
-        filter: function(model, i, collection) {
+        filter: function(model) {
           return model.get('read');
-        }
+        },
+        start: [0, 0, 0]
       },
       modifier: {
         origin: [0, 0]

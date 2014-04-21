@@ -6,7 +6,7 @@ define(function(require, exports, module) {
   // console.log(Backbone.Collection.extend().subcollection)
 
   module.exports = Backbone.Model.extend({
-    initialize: function(params) {
+    initialize: function() {
       // TODO : HOOK THIS UP TO THE SERVER :D
       // this.set('articles', new Articles(this.fetch()));
       this.set('articles', new Articles(defaultArticles));

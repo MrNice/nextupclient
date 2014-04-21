@@ -1,6 +1,5 @@
 define(function(require, exports, module) {
   'use strict';
-  var Engine           = require('famous/core/Engine');
   var Surface          = require('famous/core/Surface');
   var Transform        = require('famous/core/Transform');
   var View             = require('famous/core/View');
@@ -9,8 +8,8 @@ define(function(require, exports, module) {
   var ViewSequence     = require('famous/core/ViewSequence');
   var Scrollview       = require('famous/views/Scrollview');
   var EventHandler     = require('famous/core/EventHandler');
+  var Transitionable   = require('famous/transitions/Transitionable');
 
-  var Utility          = require('famous/utilities/Utility');
   var OptionsManager   = require('famous/core/OptionsManager');
 
   var ArticleTab       = require('./ArticleTab');
@@ -69,7 +68,7 @@ define(function(require, exports, module) {
     this.viewSequence = new ViewSequence(this.articleTabs);
     this.scrollview.sequenceFrom(this.viewSequence);
 
-    this.collection.each(function(article, i, articles) {
+    this.collection.each(function(article, i) {
       article.set('color', 'hsl(' + (i * 360 / 12) + ', 86%, 50%)');
       var temp = new ArticleTab(article, options);
 
@@ -79,27 +78,26 @@ define(function(require, exports, module) {
     }, this);
 
     this._eventInput.on('surfaceClick', function(model) {
-      console.log('container sees surface click, reemits!', model);
       this._eventOutput.emit('surfaceClick', model);
     }.bind(this.scrollview));
 
-    this.collection.on('remove', function(task, collection, removalData) {
-      this.articleTabs[removalData.index].delete(function() {
-        this.viewSequence.splice(removalData.index, 1);
-      }.bind(this));
+    this.collection.on('remove', function(article, collection, removalData) {
+        this.articleTabs[removalData.index].delete(function() {
+          this.viewSequence.splice(removalData.index, 1);
+        }.bind(this));
     }.bind(this));
 
-    this.collection.on('add', function(task) {
+    this.collection.on('add', function(article) {
+      var temp = new ArticleTab(article, options);
+      temp.transform = new Transitionable([-400, 0, 0]);
+      temp.pipe(this.scrollview);
+      temp.pipe(this._eventInput);
+      this.articleTabs.unshift(temp);
+      temp.add();
       // this.taskViews[removalData.index].delete(function() {
       //   this.viewSequence.splice(removalData.index, 1);
       // }.bind(this));
     }.bind(this));
-
-    Engine.on('click', function() {
-      console.log('clicked on the page');
-      console.log(this);
-      this._eventOutput.emit('testEvent');
-    }.bind(this.scrollview));
 
     _createBackground.call(this);
     _createHeader.call(this, this.options.name);
@@ -109,7 +107,6 @@ define(function(require, exports, module) {
     EventHandler.setInputHandler(this, this.scrollview);
     EventHandler.setOutputHandler(this, this.scrollview);
     this.scrollview.subscribe(this.container);
-
   }
 
   ArticleContainer.prototype = Object.create(View.prototype);
@@ -131,6 +128,7 @@ define(function(require, exports, module) {
       }
     },
     backgroundPosition: [0, 0],
+    start: [0, 0, 0],
     name: 'Read'
   };
 
